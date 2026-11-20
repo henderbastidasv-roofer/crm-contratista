@@ -49,8 +49,16 @@ export function guardarEnv(vars) {
 }
 
 /** Pregunta en la Terminal. Con oculto=true no se ve lo que escribes (para claves). */
-export function preguntar(texto, { oculto = false } = {}) {
-  if (oculto && process.stdin.isTTY) return preguntarOculto(texto);
+let lineas = null;
+export async function preguntar(texto, { oculto = false } = {}) {
+  if (!process.stdin.isTTY) {
+    // Sin Terminal (entrada por tubería): un solo lector para no perder líneas.
+    process.stdout.write(texto + "\n");
+    lineas ??= readline.createInterface({ input: process.stdin })[Symbol.asyncIterator]();
+    const { value, done } = await lineas.next();
+    return done ? "" : String(value).trim();
+  }
+  if (oculto) return preguntarOculto(texto);
   return new Promise((resolve) => {
     const rl = readline.createInterface({ input: process.stdin, output: process.stdout, terminal: true });
     rl.question(texto, (r) => {
