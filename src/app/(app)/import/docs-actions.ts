@@ -5,6 +5,7 @@ import { extractText, getDocumentProxy } from "unpdf";
 import { createClient, requireSession } from "@/lib/supabase/server";
 import { FILES_BUCKET } from "@/lib/files";
 import { normalizeStreet, parseRoofrProposal } from "@/lib/roofr-pdf";
+import { parseAddress } from "@/lib/roofr-import";
 
 type DB = Awaited<ReturnType<typeof createClient>>;
 
@@ -233,7 +234,20 @@ export async function importContactsChunk(rows: ContactRow[], offset: number): P
     }
     const email = norm(r.email).toLowerCase();
     const phone = norm(r.phone);
-    const address = norm(r.address);
+    let address = norm(r.address);
+    let city = norm(r.city);
+    let state = norm(r.state);
+    let zip = norm(r.zip);
+    // La "Job Location" de Roofr trae todo junto ("123 Main St, Houston, TX 77001"; a veces varias con ";").
+    if (address && !city && address.includes(",")) {
+      const a = parseAddress(address.split(";")[0]);
+      if (a) {
+        address = a.address_line;
+        city = a.city ?? "";
+        state = a.state || state;
+        zip = a.zip ?? zip;
+      }
+    }
     if (!first && !last && !email && !phone) {
       out.errors.push({ row: rowNo, error: "Fila sin nombre, correo ni teléfono" });
       continue;
@@ -266,9 +280,9 @@ export async function importContactsChunk(rows: ContactRow[], offset: number): P
         company_id: s.companyId,
         contact_id: c.id,
         address_line: address,
-        city: norm(r.city) || null,
-        state: norm(r.state) || "TX",
-        zip: norm(r.zip) || null,
+        city: city || null,
+        state: state || "TX",
+        zip: zip || null,
       });
     if (email) emails.add(email);
     if (digits(phone).length === 10) phones.add(digits(phone));
