@@ -1,0 +1,10 @@
+# Nunca subir llaves ni archivos locales a Vercel (las variables se cargan aparte en el proyecto).
+.env*
+!.env.ejemplo
+node_modules
+.next
+.vercel
+scripts
+coverage
+respaldos
+docs

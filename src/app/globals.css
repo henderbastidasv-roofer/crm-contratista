@@ -1,0 +1,154 @@
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "./preflight.css" layer(base);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+/*
+  Estilo 2026-11-17: con personalidad, inspirado en el sitio de Roofr (sin copiar su diseño ni su fuente).
+  - Tipografía: Figtree (Google Fonts, gratis), parecida a Circular. Titulares en 800–900, apretados.
+  - Azul eléctrico como color principal; un rojo (#e8022c) para alertas y acentos.
+  - Fondo azul muy claro, tarjetas blancas redondeadas con sombra suave, botones en píldora.
+  Nota: el token se sigue llamando "navy" para no tocar cada pantalla, pero ahora es el azul principal.
+*/
+@theme inline {
+  --color-paper: #f3f7fe;
+  --color-surface: #ffffff;
+  --color-sunk: #e9f0fc;
+  --color-ink: #0b1526;
+  --color-muted: #52607a;
+  --color-faint: #8592a9;
+  --color-line: #d9e3f2;
+  --color-line-soft: #e7eef9;
+  --color-navy: #1f6bff;
+  --color-navy-soft: #4d8bff;
+  --color-navy-dark: #1452d4;
+  --color-navy-tint: #e5eeff;
+  --color-deep: #0a2c78;
+  --color-brand: #e8022c;
+  --color-brand-dark: #bf0024;
+  --color-brand-tint: #fde8ec;
+  --color-ok: #0f8a55;
+  --color-ok-tint: #e1f5ea;
+  --color-warn: #b25e00;
+  --color-warn-tint: #fff1dc;
+  --font-sans: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-figtree), ui-sans-serif, sans-serif;
+  /* Solo para códigos (hash de la firma) */
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Titulares gruesos y apretados */
+.font-display {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  text-transform: none;
+}
+
+/* Etiquetas, fechas y cifras pequeñas (antes en letra mono) */
+.font-label {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.font-label.uppercase {
+  font-weight: 800;
+}
+
+/* Números de dinero alineados */
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+thead th {
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--color-faint);
+}
+
+::selection {
+  background: var(--color-navy-tint);
+}
+
+/* Palabra resaltada en azul dentro de un titular */
+.hl {
+  color: var(--color-navy);
+}
+
+/* Tarjetas que flotan sobre la ilustración de la entrada */
+@keyframes float-y {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+.float-card {
+  animation: float-y 6s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .float-card {
+    animation: none;
+  }
+}
+
+@layer components {
+  .kicker {
+    @apply text-[11px] font-extrabold uppercase tracking-[0.16em] text-faint;
+  }
+  /* Grosor y tracking en CSS directo: con @apply junto a font-display se perdían */
+  .page-title {
+    @apply font-display text-[32px] leading-[1.05] text-ink md:text-[42px];
+    font-weight: 900;
+    letter-spacing: -0.035em;
+  }
+  .section-title {
+    @apply font-display text-[21px] leading-tight text-ink;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .btn-primary,
+  .btn-navy,
+  .btn-ghost {
+    @apply inline-flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-full px-5 text-sm font-bold whitespace-nowrap transition active:translate-y-px disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  /* Acción principal: azul sólido */
+  .btn-primary {
+    @apply bg-navy text-white shadow-[0_6px_16px_-6px_rgba(31,107,255,0.55)] hover:bg-navy-dark;
+  }
+  /* Acción secundaria: tinte azul */
+  .btn-navy {
+    @apply bg-navy-tint text-navy hover:bg-[#d5e3ff];
+  }
+  /* Contorno, como "Log in" */
+  .btn-ghost {
+    @apply border border-line bg-surface text-ink hover:border-navy/50 hover:text-navy;
+  }
+
+  .input {
+    @apply min-h-11 w-full rounded-xl border border-line bg-surface px-3.5 py-2 text-[15px] text-ink outline-none transition placeholder:text-faint focus:border-navy focus:ring-4 focus:ring-navy/12 disabled:bg-paper disabled:text-muted;
+  }
+  .label {
+    @apply mb-1.5 block text-[13px] font-semibold text-ink;
+  }
+  .card {
+    @apply rounded-2xl border border-line bg-surface shadow-[0_1px_2px_rgba(11,21,38,0.04),0_12px_32px_-18px_rgba(20,82,212,0.22)];
+  }
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold;
+  }
+}
